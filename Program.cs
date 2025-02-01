@@ -77,6 +77,8 @@ internal static class Program
                 if (parts.Length > 2)
                     throw new Exception($"Invalid path filter specification: '{pathFilterSpec}'. Expected: path[=operation1[,operation2,...]]");
                 var methods = parts.Length == 2 ? parts[1].Split(',') : null;
+                if (paths.ContainsKey(parts[0]))
+                    throw new Exception($"Duplicate path filter specification: '{parts[0]}' in '{pathFilterSpec}'.");
                 paths.Add(parts[0], methods);
             }
 
