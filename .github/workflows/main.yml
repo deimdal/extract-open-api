@@ -1,0 +1,66 @@
+name: "Build package"
+
+on:
+  push:
+    branches: [ "main" ]
+  release:
+    types: [published]
+
+env:
+  PROJECT_PATH: 'Deimdal.ExtractOpenApi.csproj'
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/nupkgout
+  NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
+  DOTNET_VER: '9.x'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VER }}
+    - name: 'Restore dependencies'
+      run: dotnet restore ${{ env.PROJECT_PATH }}
+    - name: 'Build'
+      run: dotnet build ${{ env.PROJECT_PATH }} --no-restore --configuration Release
+    - name: 'Test'
+      run: dotnet test ${{ env.PROJECT_PATH }} --no-build --verbosity normal
+    - name: 'Prepare output'
+      if: ${{ success() }}
+      run: rm -rf ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+    - name: 'Pack'
+      if: ${{ success() }}
+      run: dotnet pack  ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release -p:PackageVersion=${{ github.event_name == 'release' && github.event.release.tag_name || '0.0.1-dev' }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+    - name: ls
+      run: ls -l ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
+    - name: 'Upload package artifact'
+      if: ${{ github.event_name == 'release' && success() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: package
+        retention-days: 5
+        path: ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VER }}
+    - name: 'Download package artifact'
+      uses: actions/download-artifact@v4
+      with:
+        name: package
+        path: ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+    - name: 'Push package'
+      run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg -k ${{ secrets.NUGET_AUTH_TOKEN }} -s ${{ env.NUGET_SOURCE_URL }}
+    - name: 'Attach package to release'
+      run: gh release upload ${{ github.event.release.tag_name }} ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
