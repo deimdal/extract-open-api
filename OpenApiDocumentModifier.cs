@@ -92,17 +92,33 @@ public static class OpenApiDocumentModifier
     private static void CheckSchemaExtractable(OpenApiSchema? schema, HashSet<OpenApiSchema> rootSchemas)
     {
         if (schema is { Reference.Id: not null })
-        {
-            var added = rootSchemas.Add(schema);
-            if (added)
-                ProcessProperties(schema, rootSchemas);
-        }
+            ProcessPropertiesIfNew(schema, rootSchemas);
         else if (schema is { Items.Reference: not null })
+            ProcessPropertiesIfNew(schema.Items, rootSchemas);
+        else
         {
-            var added = rootSchemas.Add(schema.Items);
-            if (added)
-                ProcessProperties(schema.Items, rootSchemas);
+            if (schema is { AllOf.Count: > 0 })
+                foreach (var subschema in schema.AllOf)
+                    ProcessPropertiesIfNew(subschema, rootSchemas);
+
+            if (schema is { OneOf.Count: > 0 })
+                foreach (var subschema in schema.OneOf)
+                    ProcessPropertiesIfNew(subschema, rootSchemas);
+
+            if (schema is { AnyOf.Count: > 0 })
+                foreach (var subschema in schema.AnyOf)
+                    ProcessPropertiesIfNew(subschema, rootSchemas);
+
+            if (schema is { Not.Reference: not null })
+                ProcessPropertiesIfNew(schema.Not, rootSchemas);
         }
+    }
+
+    private static void ProcessPropertiesIfNew(OpenApiSchema schema, HashSet<OpenApiSchema> schemas)
+    {
+        var added = schemas.Add(schema);
+        if (added)
+            ProcessProperties(schema, schemas);
     }
 
     private static void ProcessProperties(OpenApiSchema schema, HashSet<OpenApiSchema> schemas)
