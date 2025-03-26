@@ -97,16 +97,16 @@ public static class OpenApiDocumentModifier
             ProcessPropertiesIfNew(schema.Items, rootSchemas);
         else
         {
-            if (schema is { AllOf.Count: > 0 })
-                foreach (var subschema in schema.AllOf)
+            if (schema is { AllOf: not null })
+                foreach (var subschema in schema.AllOf.Where(s => s.Reference is not null))
                     ProcessPropertiesIfNew(subschema, rootSchemas);
 
-            if (schema is { OneOf.Count: > 0 })
-                foreach (var subschema in schema.OneOf)
+            if (schema is { OneOf: not null })
+                foreach (var subschema in schema.OneOf.Where(s => s.Reference is not null))
                     ProcessPropertiesIfNew(subschema, rootSchemas);
 
-            if (schema is { AnyOf.Count: > 0 })
-                foreach (var subschema in schema.AnyOf)
+            if (schema is { AnyOf: not null })
+                foreach (var subschema in schema.AnyOf.Where(s => s.Reference is not null))
                     ProcessPropertiesIfNew(subschema, rootSchemas);
 
             if (schema is { Not.Reference: not null })
