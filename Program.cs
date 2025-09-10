@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
+using System.CommandLine.Help;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -15,35 +16,37 @@ internal static class Program
 {
     public static Task<int> Main(string[] args)
     {
-        var sourceOption = new Option<string>(["-s", "--source"])
+        var sourceOption = new Option<string>("--source", "-s")
         {
-            IsRequired = true,
+            Required = true,
             AllowMultipleArgumentsPerToken = false,
             Description = "Source OpenApi specification location (file or URL)."
         };
-        var pathsFilterOption = new Option<string[]>(["-p", "--paths"])
+        var pathsFilterOption = new Option<string[]>("--paths", "-p")
         {
-            IsRequired = true,
+            Required = true,
             AllowMultipleArgumentsPerToken = true,
             Description = "Path selection filter. Format: path1[=operation1[,operation2,...]] path2[=operation3[,operation4,...]]"
         };
-        var destinationFileOption = new Option<FileInfo>(["-d", "--dest-file"])
+        var destinationFileOption = new Option<FileInfo>("--dest-file", "-d")
         {
-            IsRequired = true,
+            Required = true,
             AllowMultipleArgumentsPerToken = false,
             Description = "Destination OpenApi file name."
         };
-        var destinationVersionOption = new Option<OpenApiSpecVersion>(["-v", "--dest-version"], getDefaultValue: () => OpenApiSpecVersion.OpenApi3_0)
+        var destinationVersionOption = new Option<OpenApiSpecVersion>("--dest-version", "-v")
         {
-            IsRequired = false,
+            Required = false,
             AllowMultipleArgumentsPerToken = false,
             Description = "Destination OpenApi document version.",
+            DefaultValueFactory = _ => OpenApiSpecVersion.OpenApi3_0
         };
-        var destinationFormatOption = new Option<OpenApiFormat>(["-f", "--dest-format"], getDefaultValue: () => OpenApiFormat.Yaml)
+        var destinationFormatOption = new Option<OpenApiFormat>("--dest-format", "-f")
         {
-            IsRequired = false,
+            Required = false,
             AllowMultipleArgumentsPerToken = false,
             Description = "Destination OpenApi document format.",
+            DefaultValueFactory = _ => OpenApiFormat.Yaml
         };
 
         var rootCommand = new Command("extract-open-api", "Modify OpenApi document to contain only selected paths and operations")
@@ -53,11 +56,20 @@ internal static class Program
             destinationFileOption,
             destinationVersionOption,
             destinationFormatOption,
+            new HelpOption(),
+            new VersionOption()
         };
 
-        rootCommand.SetHandler(ProcessDocument, sourceOption, destinationFileOption, pathsFilterOption, destinationVersionOption, destinationFormatOption);
+        rootCommand.SetAction((parseResult, _) => ProcessDocument(
+            parseResult.GetRequiredValue(sourceOption),
+            parseResult.GetRequiredValue(destinationFileOption),
+            parseResult.GetRequiredValue(pathsFilterOption),
+            parseResult.GetValue(destinationVersionOption),
+            parseResult.GetValue(destinationFormatOption)
+        ));
 
-        return rootCommand.InvokeAsync(args);
+        var parseResult = rootCommand.Parse(args);
+        return parseResult.InvokeAsync();
     }
 
     private static async Task ProcessDocument(

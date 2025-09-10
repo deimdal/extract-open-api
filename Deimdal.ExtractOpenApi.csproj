@@ -24,7 +24,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.OpenApi" Version="1.6.23" />
         <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.23" />
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
+        <PackageReference Include="System.CommandLine" Version="2.0.0-rc.1.25451.107" />
         <None Include="README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
