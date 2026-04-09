@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deimdal.ExtractOpenApi", "Deimdal.ExtractOpenApi\Deimdal.ExtractOpenApi.csproj", "{1F84B0B1-566D-40BA-9CC2-43C3AD995DDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deimdal.ExtractOpenApi.Tests", "Deimdal.ExtractOpenApi.Tests\Deimdal.ExtractOpenApi.Tests.csproj", "{0420A0A8-4505-4CA7-8161-2C674C36A679}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F84B0B1-566D-40BA-9CC2-43C3AD995DDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F84B0B1-566D-40BA-9CC2-43C3AD995DDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F84B0B1-566D-40BA-9CC2-43C3AD995DDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F84B0B1-566D-40BA-9CC2-43C3AD995DDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0420A0A8-4505-4CA7-8161-2C674C36A679}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0420A0A8-4505-4CA7-8161-2C674C36A679}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0420A0A8-4505-4CA7-8161-2C674C36A679}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0420A0A8-4505-4CA7-8161-2C674C36A679}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -7,7 +7,8 @@ on:
     types: [published]
 
 env:
-  PROJECT_PATH: 'Deimdal.ExtractOpenApi.csproj'
+  PROJECT_PATH: 'Deimdal.ExtractOpenApi/Deimdal.ExtractOpenApi.csproj'
+  TEST_PROJECT_PATH: 'Deimdal.ExtractOpenApi.Tests/Deimdal.ExtractOpenApi.Tests.csproj'
   PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/nupkgout
   NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
   DOTNET_VER: '10.x'
@@ -29,7 +30,7 @@ jobs:
     - name: 'Build'
       run: dotnet build ${{ env.PROJECT_PATH }} -p:Version=${{ steps.vars.outputs.VERSION }} --no-restore --configuration Release
     - name: 'Test'
-      run: dotnet test ${{ env.PROJECT_PATH }} --no-build --verbosity normal
+      run: dotnet test ${{ env.TEST_PROJECT_PATH }} --verbosity normal
     - name: 'Prepare output'
       if: ${{ success() }}
       run: rm -rf ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
