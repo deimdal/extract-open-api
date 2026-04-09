@@ -23,8 +23,11 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VER }}
     - name: 'Restore dependencies'
       run: dotnet restore ${{ env.PROJECT_PATH }}
+    - name: Extract version
+      id: vars
+      run: echo "VERSION=${{ github.event_name == 'release' && github.event.release.tag_name || '0.0.1-dev' }}" >> $GITHUB_OUTPUT
     - name: 'Build'
-      run: dotnet build ${{ env.PROJECT_PATH }} --no-restore --configuration Release
+      run: dotnet build ${{ env.PROJECT_PATH }} -p:Version=${{ steps.vars.outputs.VERSION }} --no-restore --configuration Release
     - name: 'Test'
       run: dotnet test ${{ env.PROJECT_PATH }} --no-build --verbosity normal
     - name: 'Prepare output'
@@ -32,7 +35,7 @@ jobs:
       run: rm -rf ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
     - name: 'Pack'
       if: ${{ success() }}
-      run: dotnet pack  ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release -p:PackageVersion=${{ github.event_name == 'release' && github.event.release.tag_name || '0.0.1-dev' }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+      run: dotnet pack  ${{ env.PROJECT_PATH }} --no-restore --no-build --configuration Release -p:PackageVersion=${{ steps.vars.outputs.VERSION }} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
     - name: ls
       run: ls -l ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
     - name: 'Upload package artifact'
