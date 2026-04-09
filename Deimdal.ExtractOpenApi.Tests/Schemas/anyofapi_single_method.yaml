@@ -40,6 +40,8 @@ components:
           $ref: '#/components/schemas/Months'
         second_month:
           $ref: '#/components/schemas/Months'
+        third_month:
+          $ref: '#/components/schemas/MonthFull'
       description: A very useful data
     Months:
       type: array
@@ -60,6 +62,22 @@ components:
         - OCT
         - NOV
         - DEC
+      type: string
+    MonthFull:
+      title: Month of year full
+      enum:
+        - January
+        - February
+        - March
+        - April
+        - May
+        - June
+        - July
+        - August
+        - September
+        - October
+        - November
+        - December
       type: string
     BadRequest:
       title: BadRequest
