@@ -1,0 +1,92 @@
+openapi: 3.0.4
+info:
+  title: Response aware API
+  version: 1.0.1
+paths:
+  /process-data:
+    get:
+      tags:
+        - Getter
+      parameters:
+        - name: day
+          in: query
+          schema:
+            enum:
+              - Sunday
+              - Monday
+              - Tuesday
+              - Wednesday
+              - Thursday
+              - Friday
+              - Saturday
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        first_month:
+          $ref: '#/components/schemas/Months'
+        second_month:
+          $ref: '#/components/schemas/Months'
+      description: A very useful data
+    Months:
+      type: array
+      items:
+        $ref: '#/components/schemas/Month'
+    Month:
+      title: Month of year
+      enum:
+        - JAN
+        - FEB
+        - MAR
+        - APR
+        - MAY
+        - JUN
+        - JUL
+        - AUG
+        - SEP
+        - OCT
+        - NOV
+        - DEC
+      type: string
+    BadRequest:
+      title: BadRequest
+      type: object
+      properties:
+        error_code:
+          type: integer
+        error_text:
+          type: string
+    Unauthorized:
+      title: Unauthorized
+      type: object
+      properties:
+        error_code:
+          type: integer
+        error_text:
+          type: string
+  responses:
+    BadRequest:
+      description: 400 Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequest'
+    Unauthorized:
+      description: 401 Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Unauthorized'
