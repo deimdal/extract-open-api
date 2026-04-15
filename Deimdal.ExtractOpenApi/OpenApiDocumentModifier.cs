@@ -64,6 +64,9 @@ public static class OpenApiDocumentModifier
             if (diagnostic.Errors.Any())
             {
                 Console.WriteLine($"Errors in OpenApi document '{source}': {string.Join(", ", diagnostic.Errors)}");
+                foreach (var error in diagnostic.Errors)
+                    Console.WriteLine(error);
+
                 Console.WriteLine("This is a warning message only. Processing is being continued.");
             }
 
@@ -186,31 +189,28 @@ public static class OpenApiDocumentModifier
 
     private static void CheckSchemaExtractable(OpenApiSchema? schema, HashSet<OpenApiSchema> rootSchemas)
     {
-        if (schema is { Reference.Id: not null })
-        {
-            ProcessPropertiesIfNew(schema, rootSchemas);
-            if (schema is { Items.Reference: not null })
-                ProcessPropertiesIfNew(schema.Items, rootSchemas);
-        }
-        else if (schema is { Items.Reference: not null })
-            ProcessPropertiesIfNew(schema.Items, rootSchemas);
-        else
-        {
-            if (schema is { AllOf: not null })
-                foreach (var subschema in schema.AllOf.Where(s => s.Reference is not null))
-                    ProcessPropertiesIfNew(subschema, rootSchemas);
+        if (schema == null)
+            return;
 
-            if (schema is { OneOf: not null })
-                foreach (var subschema in schema.OneOf.Where(s => s.Reference is not null))
-                    ProcessPropertiesIfNew(subschema, rootSchemas);
+        ProcessPropertiesIfNew(schema, rootSchemas);
 
-            if (schema is { AnyOf: not null })
-                foreach (var subschema in schema.AnyOf.Where(s => s.Reference is not null))
-                    ProcessPropertiesIfNew(subschema, rootSchemas);
+        if (schema.Items != null)
+            CheckSchemaExtractable(schema.Items, rootSchemas);
 
-            if (schema is { Not.Reference: not null })
-                ProcessPropertiesIfNew(schema.Not, rootSchemas);
-        }
+        if (schema.AllOf.Count > 0)
+            foreach (var subschema in schema.AllOf)
+                CheckSchemaExtractable(subschema, rootSchemas);
+
+        if (schema.OneOf.Count > 0)
+            foreach (var subschema in schema.OneOf)
+                CheckSchemaExtractable(subschema, rootSchemas);
+
+        if (schema.AnyOf.Count > 0)
+            foreach (var subschema in schema.AnyOf)
+                CheckSchemaExtractable(subschema, rootSchemas);
+
+        if (schema is { Not.Reference: not null })
+            CheckSchemaExtractable(schema.Not, rootSchemas);
     }
 
     private static void ProcessPropertiesIfNew(OpenApiSchema schema, HashSet<OpenApiSchema> schemas)
