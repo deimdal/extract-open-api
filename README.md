@@ -6,16 +6,16 @@ Schema v2 and v3 are supported
 
 ## Usage
 
-1. Specify source document (URL or file name)
+1. Specify a source document (URL or file name)
 2. Specify destination document file name
-3. Specify path filter (what path should be preserved) with optional operation filter (see below)
+3. Specify a path filter (what path should be preserved) with an optional operation filter (see below)
 4. Specify optional parameters (if required): destination document version and format
 
-> Schema filter is not supported. Schema tree-shaking will be performed for preserved path automatically
+> Schema filter is not supported. Schema tree-shaking will be performed for preserved paths automatically
 
 ## Path and operation filter
 
-> Please, ensure your command shell allows symbols like `{` and `}`, or use escaped strings otherwise
+> Please ensure your command shell allows symbols like `{` and `}`, or use escaped strings otherwise
 
 **Path filter** can be:
 
@@ -40,22 +40,36 @@ extract-open-api -s <source OpenApi file or URL> -d <destination OpenApi file> -
 ```
 
 ## Examples
-Get specification from URL `https://petstore.swagger.io/v2/swagger.json`, preserve all operations for path `/user/{username}` and save result to file `spec.yaml` in YAML format
+Get specification from URL `https://petstore.swagger.io/v2/swagger.json`, preserve all operations for path `/user/{username}` and save a result to file `spec.yaml` in YAML format
 ```shell
 extract-open-api -s https://petstore.swagger.io/v2/swagger.json -d spec.yaml -p /user/{username}
 ```
-Get specification from URL `https://petstore.swagger.io/v2/swagger.json`, preserve all operations for path `/store/inventory` and GET operation for path `/pet/{petId}`, then save result to file `spec.yaml` in YAML format
+Get specification from URL `https://petstore.swagger.io/v2/swagger.json`, preserve all operations for path `/store/inventory` and GET operation for path `/pet/{petId}`, then save a result to file `spec.yaml` in YAML format
 ```shell
 extract-open-api -s https://petstore.swagger.io/v2/swagger.json -d spec.yaml -p /store/inventory /pet/{petId}=get
 ```
-Get specification from URL `https://petstore.swagger.io/v2/swagger.json`, preserve all operations for path `/pet`, `/pet/{petId}` and `/store/inventory`, then save result to file `spec.json` in JSON format
+Get specification from URL `https://petstore.swagger.io/v2/swagger.json`, preserve all operations for path `/pet`, `/pet/{petId}` and `/store/inventory`, then save a result to file `spec.json` in JSON format
 ```shell
 extract-open-api -s https://petstore.swagger.io/v2/swagger.json -d spec.json -f json -p /pet /pet/{petId} /store/inventory
 ```
 
 
-## See help for full parameters usage details
+## See help for full parameter usage details
 
 ```shell
 extract-open-api -h
 ```
+
+### Local testing as a tool
+1. Create a package
+    ```shell
+    dotnet pack -c Release
+    ```
+2. Uninstall any current versions (global in this example)
+    ```shell
+    dotnet tool uninstall Deimdal.ExtractOpenApi --global
+    ```
+3. Install a local package (from the root of the solution in this example)
+    ```shell
+    dotnet tool install Deimdal.ExtractOpenApi --global --add-source .\Deimdal.ExtractOpenApi\nupkg --version 0.0.1
+    ```

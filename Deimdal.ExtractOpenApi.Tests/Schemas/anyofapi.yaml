@@ -42,6 +42,8 @@ components:
           $ref: '#/components/schemas/Months'
         third_month:
           $ref: '#/components/schemas/MonthFull'
+        complexObject:
+          $ref: '#/components/schemas/ComplexAllOfSchema'
       description: A very useful data
     Months:
       type: array
@@ -78,6 +80,23 @@ components:
         - October
         - November
         - December
+      type: string
+    ComplexAllOfSchema:
+      allOf:
+        - properties:
+            year:
+              $ref: '#/components/schemas/SomeYear'
+            param1:
+              type: string
+        - properties:
+            param2:
+              type: string
+    SomeYear:
+      title: Some year
+      enum:
+        - "2021"
+        - "2022"
+        - "2023"
       type: string
     BadRequest:
       title: BadRequest
